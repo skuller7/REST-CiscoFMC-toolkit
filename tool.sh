@@ -25,9 +25,12 @@ URL="https://fmcrestapisandbox.cisco.com"
 
 echo "Izaberite opciju:"
 sleep 2 
-echo "1) Prikaz svih objekata u mrezi"
-echo "2) Prikaz verzije servera"
-echo "3) Prikaz informacija o domenu"
+echo "1) Prikaz Objekata"
+echo "2) Prikaz Uredj-a"
+echo "3) Prikaz Zdradvlja sistema"
+echo "4) Prikaz Korisnickih informacija"
+echo "5) Prikaz Politike rada"
+
 read -p "Unesite broj kategorije:" KATEGORIJA
 
 
@@ -72,15 +75,101 @@ case $KATEGORIJA in
 				;;
 		esac
 		;;
-	
 	2)
-		echo "Opcija 2 vraca Verziju i ostale meta-podatke FMC server-a u JSON dokumentu"
-		ENDPOINT="/api/fmc_platform/v1/info/serverversion"
+		echo "Izabrali ste: Devices"
+		echo "#######################################"
+		echo "1) Prikaz svih evidencija uredj-a"
+		echo "2) Prikaz svih evidentiranih podesavanja uredj-a "
+		read -p "Unesite broj opcije: " OPCIJA
+		
+		case $OPCIJA in
+			1)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/devices/devicerecords"
+				;;
+			2)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/devices/devicesettings"
+				;;
+			*)
+				echo "Nepoznata opcija, izlazim!"
+				exit 1
+				;;
+		esac
 		;;
 	3)
-		echo "Opcija 3 vraca ime domena linkovog za FMC server u JSON dokumentu"
-		ENDPOINT="/api/fmc_platform/v1/info/domain"
+		echo "Izabrali ste: Health FMC"
+		echo "#######################################"
+		echo "1) Prikaz status-a virtuelnih tunel-a"
+		echo "2) Prikaz sumerizovanih virtuelnih tunel-a"
+		echo "3) Prikaz zdravlja samog FMC uredj-a u obliku upozorenja"
+		echo "4) Prikaz zdravlja samog FMC uredj-a u obliku metrike"
+		read -p "Unesite broj opcije: " OPCIJA
+		
+		case $OPCIJA in
+			1)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/health/tunnelstatuses"
+				;;
+			2)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/health/tunnelsummaries"
+				;;
+			3)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/health/alerts"
+				;;
+			4)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/health/metrics"
+				;;			
+			*)
+				echo "Nepoznata opcija, izlazim!"
+				exit 1
+				;;
+		esac
 		;;
+	4)
+		echo "Izabrali ste: Users"
+		echo "#######################################"
+		echo "1) Prikaz registrovanih korisnika i njhovih uloga"
+		echo "2) Prikaz registrovanih korisnika putem SSO logovanja"
+		echo "3) Prikaz registrovanih korisnika putem duoconfig-a"
+		read -p "Unesite broj opcije: " OPCIJA
+		
+		case $OPCIJA in
+			1)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/users/authroles"
+				;;
+			2)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/users/ssoconfigs"
+				;;
+			3)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/users/duoconfigs"
+			*)
+				echo "Nepoznata opcija, izlazim!"
+				exit 1
+				;;
+		esac
+		;;
+	5)
+		echo "Izabrali ste: Policy"
+		echo "#######################################"
+		echo "1) Prikaz politika prava access-policy"
+		echo "2) Prikaz politika prava vezane za NAT protokol"
+		echo "3) Prikaz politika prava vezne za Intrusion DS/PS"
+		read -p "Unesite broj opcije: " OPCIJA
+		
+		case $OPCIJA in
+			1)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/policy/accesspolicies"
+				;;
+			2)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/policy/ftdnatpolicies"
+				;;
+			3)
+				ENDPOINT="/api/fmc_config/v1/domain/$DOMAIN_UUID/policy/intrusionpolicies"
+			*)
+				echo "Nepoznata opcija, izlazim!"
+				exit 1
+				;;
+		esac
+		;;
+
 	*)
 		echo "Nepoznata opcija izlazim iz programa!"
 		sleep 3
@@ -96,4 +185,4 @@ RESPO=$(curl -X 'GET' \
   )
 
 echo "Rezultat:"
-echo "$RESPO" | jq '.'
+echo "$RESPO" | jq '.' 
